@@ -1,4 +1,4 @@
-```markdown
+
 ## Lua Programs
 
 `program1_demo.lua` - This file demonstrates four Lua data types: number, string, boolean, and table. It also demonstrates two built-in operations or methods for each data type.
@@ -11,7 +11,7 @@
 
 ```powershell
 winget install DEVCOM.Lua
-```
+
 
 Close and reopen the terminal, then check the install:
 
@@ -32,4 +32,4 @@ lua ./program2_demo.lua
 ```powershell
 lua ./program3_demo.lua
 ```
-```
+
