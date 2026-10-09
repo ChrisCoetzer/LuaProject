@@ -11,7 +11,7 @@
 
 ```powershell
 winget install DEVCOM.Lua
-
+```
 
 Close and reopen the terminal, then check the install:
 
