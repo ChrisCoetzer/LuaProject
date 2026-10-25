@@ -1,5 +1,6 @@
 
 local menu = require("menu")
+local wordle = require("wordle")
 local currentScreen = "menu"
 
 -- Lua Mini Arcade
@@ -20,13 +21,7 @@ function love.draw()
         menu.draw(titleFont, buttonFont)
 
     elseif currentScreen == "wordle" then
-        -- Wordle placeholder screen
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(titleFont)
-        love.graphics.printf("WORDLE", 0, 100, 800, "center")
-
-        love.graphics.setFont(buttonFont)
-        love.graphics.printf("Wordle game coming soon!", 0, 250, 800, "center")
+        wordle.draw()
 
     elseif currentScreen == "sudoku" then
         love.graphics.setColor(1, 1, 1)
@@ -62,5 +57,14 @@ function love.keypressed(key)
     -- Press Escape to return to the main menu
     if key == "escape" then
         currentScreen = "menu"
+
+    elseif currentScreen == "wordle" then
+        wordle.keypressed(key)
+    end
+end
+
+function love.textinput(text)
+    if currentScreen == "wordle" then
+        wordle.textinput(text)
     end
 end
