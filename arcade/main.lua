@@ -1,6 +1,7 @@
 
 local menu = require("menu")
 local wordle = require("wordle")
+local sudoku = require("sudoku")
 local currentScreen = "menu"
 
 -- Lua Mini Arcade
@@ -10,6 +11,7 @@ function love.load()
 
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
+    sudoku.load()
 end
 
 function love.draw()
@@ -24,12 +26,7 @@ function love.draw()
         wordle.draw()
 
     elseif currentScreen == "sudoku" then
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(titleFont)
-        love.graphics.printf("SUDOKU", 0, 100, 800, "center")
-    
-        love.graphics.setFont(buttonFont)
-        love.graphics.printf("Sudoku game coming soon!", 0, 250, 800, "center")
+        sudoku.draw()
     
     elseif currentScreen == "memory" then
         love.graphics.setColor(1, 1, 1)
@@ -50,6 +47,8 @@ function love.mousepressed(x, y, button)
             currentScreen = selectedGame
             print(selectedGame .. " selected!")
         end
+    elseif currentScreen == "sudoku" then
+        sudoku.mousepressed(x, y, button)
     end
 end
 
@@ -60,6 +59,8 @@ function love.keypressed(key)
 
     elseif currentScreen == "wordle" then
         wordle.keypressed(key)
+    elseif currentScreen == "sudoku" then
+        sudoku.keypressed(key)
     end
 end
 
