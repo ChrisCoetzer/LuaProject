@@ -85,6 +85,16 @@ love arcade
 For additional instructions, visit:
 https://love2d.org/wiki/Getting_Started
 
+### Difficulty
+
+On the main menu, click Easy (green), Medium (yellow), or Hard (red),
+or use the Left / Right arrow keys.
+
+Wordle uses five-letter words on every level: Easy allows 8 guesses, Medium 6,
+and Hard 4. Selecting Wordle always starts a fresh round. Press Escape to return
+to the menu. Sudoku and Memory Match remain placeholders; their difficulty rules
+will be added when those games are implemented.
+
 ### Project Structure
 
 ```text
@@ -107,4 +117,3 @@ LuaProject/
 - **Memory Match:** Pending implementation.
 
 The current GUI is a basic starting point and may be modified or improved as development continues.
-

@@ -2,6 +2,8 @@
 local menu = require("menu")
 local wordle = require("wordle")
 local currentScreen = "menu"
+local selectedDifficulty = "Medium"
+local difficultyFont
 
 -- Lua Mini Arcade
 function love.load()
@@ -10,6 +12,7 @@ function love.load()
 
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
+    difficultyFont = love.graphics.newFont(16)
 end
 
 function love.draw()
@@ -18,7 +21,7 @@ function love.draw()
 
     if currentScreen == "menu" then
         -- Display the main menu
-        menu.draw(titleFont, buttonFont)
+        menu.draw(titleFont, buttonFont, selectedDifficulty, difficultyFont)
 
     elseif currentScreen == "wordle" then
         wordle.draw()
@@ -44,9 +47,15 @@ end
 
 function love.mousepressed(x, y, button)
     if currentScreen == "menu" then
-        local selectedGame = menu.mousepressed(x, y, button)
+        local selectedGame, difficulty = menu.mousepressed(x, y, button)
+        if difficulty then
+            selectedDifficulty = difficulty
+        end
 
         if selectedGame then
+            if selectedGame == "wordle" then
+                wordle.start(selectedDifficulty)
+            end
             currentScreen = selectedGame
             print(selectedGame .. " selected!")
         end
@@ -57,6 +66,9 @@ function love.keypressed(key)
     -- Press Escape to return to the main menu
     if key == "escape" then
         currentScreen = "menu"
+
+    elseif currentScreen == "menu" then
+        selectedDifficulty = menu.keypressed(key, selectedDifficulty)
 
     elseif currentScreen == "wordle" then
         wordle.keypressed(key)
