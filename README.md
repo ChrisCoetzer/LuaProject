@@ -162,12 +162,6 @@ objects and primitive values used by this format, not general JSON arrays/null.
 Missing saves start empty; unreadable or invalid saves show a warning.
 Failed writes return an error and roll back the new result in memory.
 
-### Current Scope
-
-Wordle still needs win/loss detection and a call to `results.complete`.
-Sudoku and Memory Match can use the same interface once their games are ready.
-The results demo is a UI preview, not evidence that game integration is finished.
-
 ### Running the Statistics Tests
 
 From the repository root, run:
