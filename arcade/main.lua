@@ -1,6 +1,10 @@
 
 local menu = require("menu")
 local wordle = require("wordle")
+local results = require("results")
+local stats = require("stats")
+local statsScreen = require("stats_screen")
+local statsMessage
 local currentScreen = "menu"
 
 -- Lua Mini Arcade
@@ -10,6 +14,12 @@ function love.load()
 
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
+    local ok, message = stats.load()
+    if not ok then statsMessage = message end
+end
+
+function love.update(dt)
+    if results.takeCompleted() then currentScreen = "results" end
 end
 
 -- Handle Memory match time based events
@@ -26,6 +36,15 @@ function love.draw()
     if currentScreen == "menu" then
         -- Display the main menu
         menu.draw(titleFont, buttonFont)
+        love.graphics.setFont(buttonFont)
+        love.graphics.setColor(0.75, 0.8, 0.9)
+        love.graphics.printf("S: Statistics    R: Results demo", 0, 525, 800, "center")
+
+    elseif currentScreen == "results" then
+        results.draw(titleFont, buttonFont)
+
+    elseif currentScreen == "stats" then
+        statsScreen.draw(titleFont, buttonFont, statsMessage)
 
     elseif currentScreen == "wordle" then
         wordle.draw()
@@ -69,6 +88,14 @@ function love.keypressed(key)
     -- Press Escape to return to the main menu
     if key == "escape" then
         currentScreen = "menu"
+
+    elseif (currentScreen == "menu" or currentScreen == "results") and key == "s" then
+        currentScreen = "stats"
+
+    elseif currentScreen == "menu" and key == "r" then
+        results.show({ game = "wordle", difficulty = "normal", won = true,
+            elapsedSeconds = 95, attempts = 4 }, true)
+        currentScreen = "results"
 
     elseif currentScreen == "wordle" then
         wordle.keypressed(key)
