@@ -12,6 +12,13 @@ function love.load()
     buttonFont = love.graphics.newFont(20)
 end
 
+-- Handle Memory match time based events
+function love.update(dt)
+    if currentScreen == "memory" then
+        memory.update(dt)
+    end
+end 
+
 function love.draw()
     -- Background
     love.graphics.clear(0.08, 0.11, 0.19)
@@ -48,8 +55,13 @@ function love.mousepressed(x, y, button)
 
         if selectedGame then
             currentScreen = selectedGame
+            if selectedGame == "memory" then
+                memory.reset()
+            end
             print(selectedGame .. " selected!")
         end
+    elseif currentScreen == "memory" then
+        memory.mousepressed(x,y, button)
     end
 end
 
