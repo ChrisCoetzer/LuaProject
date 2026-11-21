@@ -55,13 +55,18 @@ function love.mousepressed(x, y, button)
 
         if selectedGame then
             currentScreen = selectedGame
+
             if selectedGame == "memory" then
                 memory.reset()
+
+            elseif selectedGame == "wordle" then
+                wordle.reset()
             end
+
             print(selectedGame .. " selected!")
         end
     elseif currentScreen == "memory" then
-        memory.mousepressed(x,y, button)
+        memory.mousepressed(x, y, button)
     end
 end
 
