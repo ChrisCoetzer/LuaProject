@@ -87,7 +87,19 @@ https://love2d.org/wiki/Getting_Started
 
 ### Difficulty
 
-Choose Easy, Medium, or Hard on the main menu by clicking or using the left and right arrow keys. Wordle uses five-letter words with 8 guesses on Easy, 6 on Medium, and 4 on Hard. Press Enter after a round to play again at the same difficulty. The selection currently applies to Wordle.
+Choose Easy, Medium, or Hard on the main menu by clicking or using the left and right arrow keys. Wordle uses five-letter words with 8 guesses on Easy, 6 on Medium, and 4 on Hard. Press Enter after a Wordle round to play again at the same difficulty.
+
+Each Sudoku round randomly picks one of 10 puzzles for the selected difficulty. Click a cell or margin box, then use 1–9 to toggle numbers. Multiple numbers in a cell act as notes. Use Backspace or Delete to clear the selection's notes. A solved puzzle saves its difficulty and completion time. Escape returns to the menu and discards an unfinished round.
+
+To test the completion flow on Windows, launch the arcade from PowerShell:
+
+```powershell
+$env:SUDOKU_TEST_BYPASS = '1'
+love arcade
+Remove-Item Env:SUDOKU_TEST_BYPASS
+```
+
+Press **F9** during a Sudoku round to solve the board and save a result through the normal stats flow.
 
 ### Project Structure
 
@@ -104,6 +116,8 @@ LuaProject/
     ├── results.lua
     ├── stats.lua
     ├── stats_screen.lua
+    ├── sudoku.lua
+    ├── sudoku_puzzles.lua
     ├── test_stats.lua
     └── wordle.lua
 ```
@@ -112,7 +126,7 @@ LuaProject/
 
 - **Main Menu:** Basic GUI and game navigation implemented.
 - **Wordle:** In progress.
-- **Sudoku:** Pending implementation.
+- **Sudoku:** Playable at three difficulties, with saved completion stats.
 - **Memory Match:** Pending implementation.
 
 The current GUI is a basic starting point and may be modified or improved as development continues.
@@ -128,6 +142,7 @@ Run `love arcade` from the repository root. At the main menu:
 Statistics start empty. They include games played, wins, losses, win percentage,
 average completion time, and fastest winning time for each game.
 Average completion time includes wins and losses; fastest time includes wins only.
+The Sudoku section also shows how many puzzles you solved at each difficulty.
 
 ### Connecting a Game
 

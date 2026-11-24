@@ -43,6 +43,12 @@ function stats.load()
     return true
 end
 
+function stats.nextRoundId(game)
+    local index = 1
+    while records[game .. "-" .. index] do index = index + 1 end
+    return game .. "-" .. index
+end
+
 -- A round ID makes repeated completion notifications safe to call.
 function stats.record(roundId, result)
     if loadError then return nil, loadError end
@@ -61,10 +67,10 @@ function stats.record(roundId, result)
     return true
 end
 
-function stats.summary(game)
+function stats.summary(game, difficulty)
     local summary = { played = 0, wins = 0, losses = 0, winPercent = 0, totalSeconds = 0 }
     for _, result in pairs(records) do
-        if not game or result.game == game then
+        if (not game or result.game == game) and (not difficulty or result.difficulty == difficulty) then
             summary.played = summary.played + 1
             summary.totalSeconds = summary.totalSeconds + result.elapsedSeconds
             if result.won then

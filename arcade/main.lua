@@ -1,6 +1,7 @@
 
 local menu = require("menu")
 local wordle = require("wordle")
+local sudoku = require("sudoku")
 local memory = require("memory")
 local results = require("results")
 local stats = require("stats")
@@ -17,6 +18,7 @@ function love.load()
 
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
+    sudoku.load()
     difficultyFont = love.graphics.newFont(16)
     local ok, message = stats.load()
     if not ok then statsMessage = message end
@@ -26,6 +28,8 @@ function love.update(dt)
     if results.takeCompleted() then currentScreen = "results" end
     if currentScreen == "memory" then
         memory.update(dt)
+    elseif currentScreen == "sudoku" then
+        sudoku.update(dt)
     end
 end
 
@@ -50,12 +54,7 @@ function love.draw()
         wordle.draw()
 
     elseif currentScreen == "sudoku" then
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(titleFont)
-        love.graphics.printf("SUDOKU", 0, 100, 800, "center")
-
-        love.graphics.setFont(buttonFont)
-        love.graphics.printf("Sudoku game coming soon!", 0, 250, 800, "center")
+        sudoku.draw()
 
     elseif currentScreen == "memory" then
         memory.draw()
@@ -76,10 +75,14 @@ function love.mousepressed(x, y, button)
 
             elseif selectedGame == "wordle" then
                 wordle.reset(selectedDifficulty)
+            elseif selectedGame == "sudoku" then
+                sudoku.reset(selectedDifficulty)
             end
 
             print(selectedGame .. " selected!")
         end
+    elseif currentScreen == "sudoku" then
+        sudoku.mousepressed(x, y, button)
     elseif currentScreen == "memory" then
         memory.mousepressed(x, y, button)
     end
@@ -103,6 +106,8 @@ function love.keypressed(key)
 
     elseif currentScreen == "wordle" then
         wordle.keypressed(key)
+    elseif currentScreen == "sudoku" then
+        sudoku.keypressed(key)
     end
 end
 
