@@ -1,0 +1,28 @@
+
+return {
+    "APPLE", "PLANT", "HOUSE", "WATER",
+    "CHAIR", "TIGER", "MUSIC", "LIGHT",
+    "BRAIN", "SMILE", "GRAPE", "STONE",
+    "CLOUD", "BEACH", "WORLD", "TRAIN",
+    "DREAM", "HEART", "GREEN", "PEACH",
+    "ABOUT", "ABOVE", "ACTOR", "ALIVE",
+    "ALONE", "ANGEL", "ANGER", "BREAD",
+    "BLACK", "BLINK", "BRAVE", "BROWN",
+    "CANDY", "CLEAN", "CLOCK", "DANCE",
+    "EARTH", "EMPTY", "FRUIT", "GHOST",
+    "GLASS", "HAPPY", "HORSE", "JUICE",
+    "KNIFE", "LEMON", "LUCKY", "MONEY",
+    "MOUSE", "NIGHT", "OCEAN", "PAINT",
+    "PAPER", "PARTY", "PIANO", "PIZZA",
+    "QUEEN", "RADIO", "RIVER", "ROBOT",
+    "SHARK", "SHEEP", "SHIRT", "SLEEP",
+    "SNAKE", "SNOWY", "SOUND", "SPACE",
+    "STORM", "SUGAR", "SWEET", "TABLE",
+    "TOAST", "TOUCH", "TRUCK", "VOICE",
+    "WATCH", "WHALE", "WHITE", "YOUTH",
+    "ZEBRA", "ADULT", "AFTER", "AGAIN",
+    "BASIC", "CRANE", "SLATE", "AUDIO",
+    "CRISP", "FLAME", "FRESH", "HELLO",
+    "HONEY", "MAGIC", "PEARL", "POWER",
+    "ROUND", "SHINE", "SMART", "TRUST"
+}
