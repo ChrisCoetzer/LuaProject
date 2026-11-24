@@ -8,6 +8,8 @@ local stats = require("stats")
 local statsScreen = require("stats_screen")
 local statsMessage
 local currentScreen = "menu"
+local selectedDifficulty = "Medium"
+local difficultyFont
 
 -- Lua Mini Arcade
 function love.load()
@@ -17,6 +19,7 @@ function love.load()
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
     sudoku.load()
+    difficultyFont = love.graphics.newFont(16)
     local ok, message = stats.load()
     if not ok then statsMessage = message end
 end
@@ -34,10 +37,10 @@ function love.draw()
 
     if currentScreen == "menu" then
         -- Display the main menu
-        menu.draw(titleFont, buttonFont)
+        menu.draw(titleFont, buttonFont, selectedDifficulty, difficultyFont)
         love.graphics.setFont(buttonFont)
         love.graphics.setColor(0.75, 0.8, 0.9)
-        love.graphics.printf("S: Statistics    R: Results demo", 0, 525, 800, "center")
+        love.graphics.printf("S: Statistics    R: Results demo", 0, 548, 800, "center")
 
     elseif currentScreen == "results" then
         results.draw(titleFont, buttonFont)
@@ -59,7 +62,8 @@ end
 
 function love.mousepressed(x, y, button)
     if currentScreen == "menu" then
-        local selectedGame = menu.mousepressed(x, y, button)
+        local selectedGame, difficulty = menu.mousepressed(x, y, button)
+        if difficulty then selectedDifficulty = difficulty end
 
         if selectedGame then
             currentScreen = selectedGame
@@ -68,7 +72,7 @@ function love.mousepressed(x, y, button)
                 memory.reset()
 
             elseif selectedGame == "wordle" then
-                wordle.reset()
+                wordle.reset(selectedDifficulty)
             end
 
             print(selectedGame .. " selected!")
@@ -92,6 +96,9 @@ function love.keypressed(key)
         results.show({ game = "wordle", difficulty = "normal", won = true,
             elapsedSeconds = 95, attempts = 4 }, true)
         currentScreen = "results"
+
+    elseif currentScreen == "menu" then
+        selectedDifficulty = menu.keypressed(key, selectedDifficulty)
 
     elseif currentScreen == "wordle" then
         wordle.keypressed(key)

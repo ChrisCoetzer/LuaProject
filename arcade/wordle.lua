@@ -12,6 +12,9 @@ local secretWord = words[love.math.random(#words)]
 print("Secret word: " .. secretWord)
 local gameOver = false
 local message = ""
+local guessLimits = { Easy = 8, Medium = 6, Hard = 4 }
+local difficulty = "Medium"
+local maxGuesses = guessLimits[difficulty]
 
 -- Draw the Wordle screen
 function wordle.draw()
@@ -20,11 +23,13 @@ function wordle.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("WORDLE", 0, 50, 800, "center")
 
+    love.graphics.printf(difficulty .. " - " .. maxGuesses .. " guesses", 0, 100, 800, "center")
+
     -- Wordle grid
-    for row = 1, 6 do
+    for row = 1, maxGuesses do
         for col = 1, 5 do
-            local x = 250 + (col - 1) * 60
-            local y = 150 + (row - 1) * 60
+            local x = 280 + (col - 1) * 50
+            local y = 150 + (row - 1) * 45
 
             -- Display color feedback
             if feedback[row] then
@@ -40,12 +45,12 @@ function wordle.draw()
                     love.graphics.setColor(0.34, 0.35, 0.38)
                 end
 
-                love.graphics.rectangle("fill", x, y, 50, 50)
+                love.graphics.rectangle("fill", x, y, 40, 40)
             end
 
             -- Draw tile outline
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("line", x, y, 50, 50)
+            love.graphics.rectangle("line", x, y, 40, 40)
 
             -- Display guessed letters
             local displayedGuess = guesses[row] or ""
@@ -56,7 +61,7 @@ function wordle.draw()
 
             if col <= #displayedGuess then
                 local letter = displayedGuess:sub(col, col)
-                love.graphics.printf(letter, x, y + 15, 50, "center")
+                love.graphics.printf(letter, x, y + 8, 40, "center")
             end
         end
     end
@@ -78,7 +83,7 @@ end
 
 -- Handle letter input
 function wordle.textinput(text)
-    if not gameOver and currentRow <= 6
+    if not gameOver and currentRow <= maxGuesses
         and #currentGuess < 5
         and text:match("^[a-zA-Z]$") then
 
@@ -137,7 +142,9 @@ local function checkGuess(guess)
 end
 
 -- Reset the game
-function wordle.reset()
+function wordle.reset(selectedDifficulty)
+    difficulty = selectedDifficulty or difficulty
+    maxGuesses = assert(guessLimits[difficulty], "Unknown Wordle difficulty")
     currentGuess = ""
     currentRow = 1
     guesses = {}
@@ -189,7 +196,7 @@ function wordle.keypressed(key)
             gameOver = true
 
         -- Check losing condition
-        elseif currentRow == 6 then
+        elseif currentRow == maxGuesses then
             message = "You lost! The word was " .. secretWord
             gameOver = true
         end

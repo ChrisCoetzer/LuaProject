@@ -85,6 +85,10 @@ love arcade
 For additional instructions, visit:
 https://love2d.org/wiki/Getting_Started
 
+### Difficulty
+
+Choose Easy, Medium, or Hard on the main menu by clicking or using the left and right arrow keys. Wordle uses five-letter words with 8 guesses on Easy, 6 on Medium, and 4 on Hard. Press Enter after a round to play again at the same difficulty. The selection currently applies to Wordle.
+
 ### Project Structure
 
 ```text
