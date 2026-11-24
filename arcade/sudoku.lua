@@ -1,17 +1,11 @@
 local sudoku = {}
+local results = require("results")
+local stats = require("stats")
 
-local puzzle = {
-    {5, 3, 0, 6, 7, 8, 9, 1, 2},
-    {6, 7, 2, 1, 9, 5, 3, 4, 8},
-    {1, 9, 8, 3, 4, 2, 5, 6, 7},
-    {8, 5, 9, 7, 6, 1, 4, 2, 3},
-    {4, 2, 6, 8, 0, 3, 7, 9, 1},
-    {7, 1, 3, 9, 2, 4, 8, 5, 6},
-    {9, 6, 1, 5, 3, 7, 2, 8, 4},
-    {2, 8, 7, 4, 1, 9, 6, 3, 5},
-    {3, 4, 5, 2, 8, 6, 1, 7, 0}
-}
+local puzzles = require("sudoku_puzzles")
 
+local puzzle = {}
+local difficulty, roundId, elapsed, saveError, finished
 local cells = {}
 local margins = {top = {}, bottom = {}, left = {}, right = {}}
 local selected = nil
@@ -19,27 +13,49 @@ local showWrongAnswers = false
 local gridX, gridY = 193, 112
 local cellSize = 46
 local numberFont, noteFont, labelFont
+local testingEnabled = os.getenv("SUDOKU_TEST_BYPASS") == "1"
 
--- Set up the fonts, empty player cells, and margin notes.
 function sudoku.load()
-    selected = nil
-    showWrongAnswers = false
     numberFont = love.graphics.newFont(28)
     noteFont = love.graphics.newFont(12)
     labelFont = love.graphics.newFont(16)
+end
 
+function sudoku.reset(selectedDifficulty)
+    difficulty = selectedDifficulty
+    roundId = stats.nextRoundId("sudoku")
+    elapsed = 0
+    selected, saveError = nil, nil
+    showWrongAnswers, finished = false, false
+    local pool = puzzles[difficulty]
+    local board = pool[love.math.random(#pool)]
     for row = 1, 9 do
+        local clues = board[row]
+        puzzle[row] = {}
         cells[row] = {}
         for col = 1, 9 do
+            puzzle[row][col] = tonumber(clues:sub(col, col))
             cells[row][col] = {notes = {}}
         end
     end
 
-    for side, entries in pairs(margins) do
+    for _, entries in pairs(margins) do
         for i = 1, 9 do
             entries[i] = {notes = {}}
         end
     end
+end
+
+function sudoku.update(dt)
+    if not finished then elapsed = elapsed + dt end
+end
+
+local function saveResult()
+    local _, message = results.complete(roundId, {
+        game = "sudoku", difficulty = difficulty, won = true,
+        elapsedSeconds = elapsed,
+    })
+    saveError = message
 end
 
 -- Only a single number counts as an answer. Empty cells and notes return zero.
@@ -117,6 +133,26 @@ local function isWrong(row, col)
                 return true
             end
         end
+    end
+    return false
+end
+
+local function finishRound()
+    finished = true
+    saveResult()
+end
+
+-- Start from the clues so incorrect guesses and player notes can't block a test.
+local function solveForTest(index)
+    if index == 81 then return true end
+    local row, col = math.floor(index / 9) + 1, index % 9 + 1
+    if puzzle[row][col] ~= 0 then return solveForTest(index + 1) end
+
+    local notes = cells[row][col].notes
+    for number = 1, 9 do
+        notes[number] = true
+        if not isWrong(row, col) and solveForTest(index + 1) then return true end
+        notes[number] = nil
     end
     return false
 end
@@ -226,13 +262,17 @@ function sudoku.draw()
     love.graphics.setLineWidth(1)
     love.graphics.setColor(0.75, 0.8, 0.9)
     love.graphics.setFont(labelFont)
-    love.graphics.printf("*near completed puzzle for testing*", 14, 260, 120, "center")
+    love.graphics.printf(string.format("%s\n%d:%02d", difficulty,
+        math.floor(elapsed / 60), math.floor(elapsed % 60)), 14, 260, 120, "center")
+    if saveError then
+        love.graphics.printf(saveError .. " Press Enter to retry.", 620, 230, 165, "center")
+    end
     love.graphics.printf("Click a cell or margin to edit  |  Backspace / Delete: clear  |  Esc: menu", 0, 578, 800, "center")
 end
 
 -- Select a cell or margin box, or toggle the wrong-answer highlights.
 function sudoku.mousepressed(x, y, button)
-    if button ~= 1 then
+    if finished or button ~= 1 then
         return
     end
     if isFilled() and not sudoku.isComplete() and x >= 285 and x <= 515 and y >= 41 and y <= 64 then
@@ -262,6 +302,18 @@ end
 
 -- Add, remove, or clear numbers in the selected cell or margin box.
 function sudoku.keypressed(key)
+    if finished then
+        if saveError and key == "return" then saveResult() end
+        return
+    end
+    if testingEnabled and key == "f9" then
+        for _, row in ipairs(cells) do
+            for _, cell in ipairs(row) do cell.notes = {} end
+        end
+        assert(solveForTest(0) and sudoku.isComplete(), "Sudoku test puzzle could not be solved")
+        finishRound()
+        return
+    end
     if not selected then
         return
     end
@@ -282,11 +334,11 @@ function sudoku.keypressed(key)
         return
     end
 
-    local number = tonumber(key) or tonumber(key:match("^kp([1-9])$"))
-    if number and number >= 1 and number <= 9 then
+    local number = tonumber(key:match("^([1-9])$") or key:match("^kp([1-9])$"))
+    if number then
         cell.notes[number] = not cell.notes[number]
-        if not isFilled() then
-            showWrongAnswers = false
+        if not selected.side and sudoku.isComplete() then
+            finishRound()
         end
     end
 end

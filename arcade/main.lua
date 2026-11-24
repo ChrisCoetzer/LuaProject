@@ -28,6 +28,8 @@ function love.update(dt)
     if results.takeCompleted() then currentScreen = "results" end
     if currentScreen == "memory" then
         memory.update(dt)
+    elseif currentScreen == "sudoku" then
+        sudoku.update(dt)
     end
 end
 
@@ -73,6 +75,8 @@ function love.mousepressed(x, y, button)
 
             elseif selectedGame == "wordle" then
                 wordle.reset(selectedDifficulty)
+            elseif selectedGame == "sudoku" then
+                sudoku.reset(selectedDifficulty)
             end
 
             print(selectedGame .. " selected!")

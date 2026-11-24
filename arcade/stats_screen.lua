@@ -22,6 +22,11 @@ function screen.draw(titleFont, buttonFont, message)
             or "No completed games yet"
         if summary.bestSeconds then timing = timing .. string.format("    Fastest win: %.1fs", summary.bestSeconds) end
         love.graphics.print(timing, 55, y + 56)
+        if game[1] == "sudoku" then
+            love.graphics.print(string.format("Solved by difficulty: Easy %d    Medium %d    Hard %d",
+                stats.summary("sudoku", "Easy").wins, stats.summary("sudoku", "Medium").wins,
+                stats.summary("sudoku", "Hard").wins), 55, y + 80)
+        end
     end
     if message then love.graphics.printf(message, 35, 500, 730, "center") end
     love.graphics.printf("Escape: Main menu", 0, 555, 800, "center")
