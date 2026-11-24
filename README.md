@@ -87,13 +87,7 @@ https://love2d.org/wiki/Getting_Started
 
 ### Difficulty
 
-On the main menu, click Easy (green), Medium (yellow), or Hard (red),
-or use the Left / Right arrow keys.
-
-Wordle uses five-letter words on every level: Easy allows 8 guesses, Medium 6,
-and Hard 4. Selecting Wordle always starts a fresh round. Press Escape to return
-to the menu. Sudoku and Memory Match remain placeholders; their difficulty rules
-will be added when those games are implemented.
+Choose Easy, Medium, or Hard on the main menu by clicking or using the left and right arrow keys. Wordle uses five-letter words with 8 guesses on Easy, 6 on Medium, and 4 on Hard. Press Enter after a round to play again at the same difficulty. The selection currently applies to Wordle.
 
 ### Project Structure
 
@@ -104,8 +98,13 @@ LuaProject/
 ├── program2_demo.lua
 ├── program3_demo.lua
 └── arcade/
+    ├── json.lua
     ├── main.lua
     ├── menu.lua
+    ├── results.lua
+    ├── stats.lua
+    ├── stats_screen.lua
+    ├── test_stats.lua
     └── wordle.lua
 ```
 
@@ -117,3 +116,62 @@ LuaProject/
 - **Memory Match:** Pending implementation.
 
 The current GUI is a basic starting point and may be modified or improved as development continues.
+
+## Results and Gameplay Statistics
+
+Run `love arcade` from the repository root. At the main menu:
+
+- Press **R** to preview a sample results screen. Demo results never enter saved statistics.
+- Press **S** to view statistics for Wordle, Sudoku, and Memory Match.
+- Press **Escape** to return to the menu.
+
+Statistics start empty. They include games played, wins, losses, win percentage,
+average completion time, and fastest winning time for each game.
+Average completion time includes wins and losses; fastest time includes wins only.
+
+### Connecting a Game
+
+When a round ends, call:
+
+```lua
+local results = require("results")
+
+local ok, message = results.complete(roundId, {
+    game = "wordle", -- "wordle", "sudoku", or "memory"
+    difficulty = "normal",
+    won = true,
+    elapsedSeconds = 95,
+    attempts = 4 -- optional nonnegative integer: guesses or moves
+})
+if not ok then
+    -- Display the error and allow the player to retry saving.
+    print(message)
+end
+```
+
+Generate a unique string `roundId` when starting each new round, and keep that
+same ID when retrying its completion. IDs must remain unique across app launches
+(for example, use a timestamp plus a random suffix). Repeated calls with the
+same ID will not count the round twice. The first successfully saved result wins.
+The next update switches to the results screen after a successful save.
+Measure elapsed time in each game; difficulty labels come from the difficulty module.
+Abandoned rounds should not call `complete`.
+
+### Storage
+
+`stats.lua` uses LÖVE's save directory, not the repository, for `results.json`.
+The save contains a version and completed results keyed by round ID. No database
+or downloaded dependencies are required. The included JSON codec supports the
+objects and primitive values used by this format, not general JSON arrays/null.
+Missing saves start empty; unreadable or invalid saves show a warning.
+Failed writes return an error and roll back the new result in memory.
+
+### Running the Statistics Tests
+
+From the repository root, run:
+
+```powershell
+lua arcade/test_stats.lua
+```
+
+Expected output: `Results and statistics checks passed`.

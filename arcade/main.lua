@@ -1,6 +1,11 @@
 
 local menu = require("menu")
 local wordle = require("wordle")
+local memory = require("memory")
+local results = require("results")
+local stats = require("stats")
+local statsScreen = require("stats_screen")
+local statsMessage
 local currentScreen = "menu"
 local selectedDifficulty = "Medium"
 local difficultyFont
@@ -13,6 +18,15 @@ function love.load()
     titleFont = love.graphics.newFont(36)
     buttonFont = love.graphics.newFont(20)
     difficultyFont = love.graphics.newFont(16)
+    local ok, message = stats.load()
+    if not ok then statsMessage = message end
+end
+
+function love.update(dt)
+    if results.takeCompleted() then currentScreen = "results" end
+    if currentScreen == "memory" then
+        memory.update(dt)
+    end
 end
 
 function love.draw()
@@ -22,6 +36,15 @@ function love.draw()
     if currentScreen == "menu" then
         -- Display the main menu
         menu.draw(titleFont, buttonFont, selectedDifficulty, difficultyFont)
+        love.graphics.setFont(buttonFont)
+        love.graphics.setColor(0.75, 0.8, 0.9)
+        love.graphics.printf("S: Statistics    R: Results demo", 0, 548, 800, "center")
+
+    elseif currentScreen == "results" then
+        results.draw(titleFont, buttonFont)
+
+    elseif currentScreen == "stats" then
+        statsScreen.draw(titleFont, buttonFont, statsMessage)
 
     elseif currentScreen == "wordle" then
         wordle.draw()
@@ -30,35 +53,35 @@ function love.draw()
         love.graphics.setColor(1, 1, 1)
         love.graphics.setFont(titleFont)
         love.graphics.printf("SUDOKU", 0, 100, 800, "center")
-    
+
         love.graphics.setFont(buttonFont)
         love.graphics.printf("Sudoku game coming soon!", 0, 250, 800, "center")
-    
+
     elseif currentScreen == "memory" then
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(titleFont)
-        love.graphics.printf("MEMORY MATCH", 0, 100, 800, "center")
-    
-        love.graphics.setFont(buttonFont)
-        love.graphics.printf("Memory Match game coming soon!", 0, 250, 800, "center")    
+        memory.draw()
     end
-    
+
 end
 
 function love.mousepressed(x, y, button)
     if currentScreen == "menu" then
         local selectedGame, difficulty = menu.mousepressed(x, y, button)
-        if difficulty then
-            selectedDifficulty = difficulty
-        end
+        if difficulty then selectedDifficulty = difficulty end
 
         if selectedGame then
-            if selectedGame == "wordle" then
-                wordle.start(selectedDifficulty)
-            end
             currentScreen = selectedGame
+
+            if selectedGame == "memory" then
+                memory.reset()
+
+            elseif selectedGame == "wordle" then
+                wordle.reset(selectedDifficulty)
+            end
+
             print(selectedGame .. " selected!")
         end
+    elseif currentScreen == "memory" then
+        memory.mousepressed(x, y, button)
     end
 end
 
@@ -66,6 +89,14 @@ function love.keypressed(key)
     -- Press Escape to return to the main menu
     if key == "escape" then
         currentScreen = "menu"
+
+    elseif (currentScreen == "menu" or currentScreen == "results") and key == "s" then
+        currentScreen = "stats"
+
+    elseif currentScreen == "menu" and key == "r" then
+        results.show({ game = "wordle", difficulty = "normal", won = true,
+            elapsedSeconds = 95, attempts = 4 }, true)
+        currentScreen = "results"
 
     elseif currentScreen == "menu" then
         selectedDifficulty = menu.keypressed(key, selectedDifficulty)
